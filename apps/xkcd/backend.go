@@ -31,7 +31,7 @@ var (
 func fetchXkcd(app *XkcdApp) error {
 
 	// Send GET request
-	resp, err := http.Get(XKCD_URL)
+	resp, err := http.Get(XKCD_URL_RANDOM)
 	if err != nil {
 		fmt.Printf("[XKCD] Can't request XKCD: %s\n", err)
 		return ErrXkcdCantRequest

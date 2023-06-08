@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	rl.InitWindow(400, 240, "raylib [core] example - basic window")
+	rl.InitWindow(400, 240, "Tulip v0.1.0")
 	defer rl.CloseWindow()
 	rl.SetTargetFPS(60)
 

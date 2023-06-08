@@ -10,11 +10,12 @@ import (
 )
 
 const (
-	XKCD_URL       = "https://xkcd.com/"
-	XKCD_REFRESH   = 60
-	XKCD_LINES     = 5
-	XKCD_TEXT_SIZE = 20
-	XKCD_PADDING   = 20
+	XKCD_URL        = "https://xkcd.com/"
+	XKCD_URL_RANDOM = "https://c.xkcd.com/random/comic/"
+	XKCD_REFRESH    = 60
+	XKCD_LINES      = 5
+	XKCD_TEXT_SIZE  = 20
+	XKCD_PADDING    = 20
 )
 
 type XkcdApp struct {
@@ -30,17 +31,22 @@ type XkcdApp struct {
 }
 
 func (app *XkcdApp) Init() {
-	app.LastFetch = time.Now()
 	app.camera = rl.Camera2D{
 		Zoom: 1.0,
 	}
 
 	fetchXkcd(app)
 	downloadAndProcessImage(app)
-
+	app.LastFetch = time.Now()
 }
 
 func (app *XkcdApp) Update() {
+
+	if time.Since(app.LastFetch).Seconds() > XKCD_REFRESH {
+		fetchXkcd(app)
+		downloadAndProcessImage(app)
+		app.LastFetch = time.Now()
+	}
 
 	app.lines = wrapText(app.Title, 140, XKCD_TEXT_SIZE, constants.COLOR_FG)
 	if len(app.lines) > XKCD_LINES {
@@ -54,13 +60,15 @@ func (app *XkcdApp) Update() {
 
 func (app *XkcdApp) Draw() {
 	rl.ClearBackground(constants.COLOR_BG)
-	// rl.DrawRectangle(XKCD_PADDING, XKCD_PADDING, 200, 200, constants.COLOR_FG)
+
+	// Display Comic Image
 	rl.DrawTexture(app.comicImage,
 		XKCD_PADDING+int32((200-app.comicImage.Width)/2.0),
 		XKCD_PADDING+int32((200-app.comicImage.Height)/2.0),
 		rl.White,
 	)
 
+	// Center the comic code and title text
 	rl.BeginMode2D(app.camera)
 	rl.DrawText(fmt.Sprintf("#%d", app.Code), 240, 0, XKCD_TEXT_SIZE, constants.COLOR_FG)
 	for i, line := range app.lines {
